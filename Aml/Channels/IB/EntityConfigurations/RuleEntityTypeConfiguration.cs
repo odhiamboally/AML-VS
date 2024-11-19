@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Aml.Channels.IB.Persistence.EntityConfigurations;
+namespace Aml.Channels.IB.EntityConfigurations;
 
 public class RuleEntityTypeConfiguration : IEntityTypeConfiguration<IBRule>
 {
@@ -12,6 +12,6 @@ public class RuleEntityTypeConfiguration : IEntityTypeConfiguration<IBRule>
             .Property(e => e.Description)
             .IsRequired();
 
-        
+
     }
 }

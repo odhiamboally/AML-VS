@@ -1,5 +1,5 @@
 ﻿using Aml.Channels.IB.Features.Rules.Contracts;
-using Aml.Channels.IB.Persistence.DataContext;
+using Aml.Persistence.DataContext;
 using Aml.Shared.Dtos;
 using Carter;
 using MediatR;
@@ -17,9 +17,9 @@ public static class GetRule
 
     internal sealed class Handler : IRequestHandler<Query, Response<RuleResponse>>
     {
-        private readonly IBDataContext _context;
+        private readonly DBContext _context;
 
-        public Handler(IBDataContext context)
+        public Handler(DBContext context)
         {
             _context = context;
 

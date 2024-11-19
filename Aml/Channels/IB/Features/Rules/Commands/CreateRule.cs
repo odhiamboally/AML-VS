@@ -1,6 +1,4 @@
-﻿
-using Aml.Channels.IB.Persistence.DataContext;
-using Aml.Channels.IB.Entities;
+﻿using Aml.Channels.IB.Entities;
 using Aml.Shared.Dtos;
 using MediatR;
 using System.Runtime.CompilerServices;
@@ -11,6 +9,7 @@ using System.Data;
 using System.ComponentModel.DataAnnotations;
 using Aml.Channels.IB.Features.Rules.Contracts;
 using Mapster;
+using Aml.Persistence.DataContext;
 
 namespace Aml.Channels.IB.Features.Rules.Commands;
 
@@ -34,10 +33,10 @@ public static class CreateRule
 
     internal sealed class Handler : IRequestHandler<Command, Response<int>>
     {
-        private readonly IBDataContext _context;
+        private readonly DBContext _context;
         private readonly IValidator<Command> _validator;
 
-        public Handler(IBDataContext context, IValidator<Command> validator)
+        public Handler(DBContext context, IValidator<Command> validator)
         {
             _context = context;
             _validator = validator;

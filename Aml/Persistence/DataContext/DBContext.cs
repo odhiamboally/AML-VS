@@ -1,11 +1,11 @@
 ﻿using Aml.Channels.IB.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Aml.Channels.IB.Persistence.DataContext;
+namespace Aml.Persistence.DataContext;
 
-public class IBDataContext : DbContext
+public class DBContext : DbContext
 {
-    public IBDataContext(DbContextOptions<DbContext> options) : base(options)
+    public DBContext(DbContextOptions<DbContext> options) : base(options)
     {
     }
 
