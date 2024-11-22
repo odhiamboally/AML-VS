@@ -1,4 +1,5 @@
-﻿using Aml.Channels.IB.Messaging.Consumers;
+﻿using Aml.Channels.Clearing.Features.Transactions.Commands;
+using Aml.Channels.IB.Messaging.Consumers;
 using Aml.Channels.IB.Utilities.Jobs;
 using Aml.Shared.Configurations.Api;
 using Aml.Shared.Configurations.Caching;
@@ -8,10 +9,19 @@ using Aml.Shared.Utilities.Caching;
 using Carter;
 using FluentValidation;
 using MassTransit;
+using MediatR.Extensions.FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Refit;
 using StackExchange.Redis;
+using Aml.Shared.Abstractions.Interfaces;
+using Aml.Shared.Abstractions.Implementations;
+using Aml.Channels.Clearing.Features.Transactions.Abstractions.Repositories;
+using Aml.Channels.Clearing.Features.Transactions.Abstractions.Services;
+using Aml.Persistence.DataContext;
+using System.Configuration;
+using Aml.Shared.Exceptions;
 
 namespace Aml.Shared.Utilities;
 
@@ -20,6 +30,15 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         var assembly = typeof(Program).Assembly;
+
+        var connectionString = configuration["ConnectionStrings:CHQPNTECO"];
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new NotFoundException("Connection string is not configured.");
+        }
+
+        services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
+        services.AddScoped<DapperContext>();
 
         var cacheSettings = new CacheSetting();
         configuration.GetSection("CacheSettings").Bind(cacheSettings);
@@ -60,10 +79,10 @@ public static class DependencyInjection
                 //});
 
                 // Configure individual consumers with their own endpoints
-                cfg.ReceiveEndpoint("queue_for_ConsumerA", e =>
-                {
-                    e.ConfigureConsumer<IBCustomConsumer>(context);
-                });
+                //cfg.ReceiveEndpoint("queue_for_ConsumerA", e =>
+                //{
+                //    e.ConfigureConsumer<IBCustomConsumer>(context);
+                //});
 
                 // Add more endpoints as needed for additional consumers
 
@@ -97,25 +116,25 @@ public static class DependencyInjection
             options.Scheduling.OverWriteExistingData = true; // default: true
         });
 
-        services.AddQuartz(q =>
-        {
-            var jobKey = new JobKey("CustomJob");
-            q.AddJob<CustomJob>(opts => opts
-                .WithIdentity(jobKey));
+        //services.AddQuartz(q =>
+        //{
+        //    var jobKey = new JobKey("CustomJob");
+        //    q.AddJob<CustomJob>(opts => opts
+        //        .WithIdentity(jobKey));
 
-            q.AddTrigger(opts => opts
-                .ForJob(jobKey)
-                .WithIdentity("CustomJob-trigger")
-                //.WithCronSchedule("0 0 * * * ?")); // Every hour
-                .WithSimpleSchedule(x => x
-                    .WithInterval(TimeSpan.FromMinutes(5))
-                    .RepeatForever())
-            );
+        //    q.AddTrigger(opts => opts
+        //        .ForJob(jobKey)
+        //        .WithIdentity("CustomJob-trigger")
+        //        //.WithCronSchedule("0 0 * * * ?")); // Every hour
+        //        .WithSimpleSchedule(x => x
+        //            .WithInterval(TimeSpan.FromMinutes(5))
+        //            .RepeatForever())
+        //    );
 
-        });
+        //});
 
-        //Add the Quartz hosted service
-        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        ////Add the Quartz hosted service
+        //services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
         switch (cacheSettings.CacheType)
         {
@@ -161,15 +180,17 @@ public static class DependencyInjection
                 break;
         }
 
-        
         services.AddCarter();
         services.AddMediatR(config => config.RegisterServicesFromAssembly(assembly));
         services.AddValidatorsFromAssembly(assembly);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        //services.AddScoped<IServiceManager, ServiceManager>();
+        services.AddScoped<IServiceManager, ServiceManager>();
+        services.AddScoped<ITransactionService, TransactionService>();
 
-        //services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         return services;
     }

@@ -28,7 +28,7 @@ public static class GetRule
 
         public async Task<Response<RuleResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var rulesResponse = await _context.Rules
+            var rulesResponse = await _context.IBRules!
                 .Where(rule => rule.Id == request.Id)
                 .Select(rule => new RuleResponse
                 {
@@ -46,21 +46,22 @@ public static class GetRule
     }
 
 
-    public class CreateRuleEndPoint : ICarterModule
-    {
-        public void AddRoutes(IEndpointRouteBuilder app)
-        {
-            app.MapGet("api/rule/getbyid/{int:id}", async (int id, ISender sender) =>
-            {
-                var query = new Query { Id = id };
-                var result = await sender.Send(query);
-                if (!result.Successful)
-                {
-                    return Results.NotFound(result.Exception);
-                }
+    //public class CreateRuleEndPoint : ICarterModule
+    //{
+    //    int id = 1;
+    //    public void AddRoutes(IEndpointRouteBuilder app)
+    //    {
+    //        app.MapGet("api/rule/getbyid/{int:id}", async (int id, ISender sender) =>
+    //        {
+    //            var query = new Query { Id = id };
+    //            var result = await sender.Send(query);
+    //            if (!result.Successful)
+    //            {
+    //                return Results.NotFound(result.Exception);
+    //            }
 
-                return Results.Ok(result.Data);
-            });
-        }
-    }
+    //            return Results.Ok(result.Data);
+    //        });
+    //    }
+    //}
 }

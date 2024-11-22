@@ -7,8 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Carter" Version="9.0.0" />
     <PackageReference Include="Carter.Analyzers" Version="9.0.0" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="Mapster" Version="7.4.0" />
@@ -48,7 +50,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Channels\Clearing\Features\AmlValidation\" />
     <Folder Include="Channels\Clearing\Features\Transactions\Queries\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
