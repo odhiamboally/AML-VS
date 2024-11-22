@@ -68,22 +68,6 @@ public static class CreateRule
 
         }
     }
-
-    //public static void AddEndpoint(this IEndpointRouteBuilder app)
-    //{
-
-    //    app.MapPost("api/rule/create", async (CreateRuleRequest request, ISender sender) =>
-    //    {
-    //        var command = request.Adapt<Command>();
-    //        var result = await sender.Send(command);
-    //        if (!result.Successful)
-    //        {
-    //            return Results.BadRequest(result.Exception);
-    //        }
-
-    //        return Results.Ok(result.Data);
-    //    });
-    //}
 }
 
 public class CreateRuleEndPoint : ICarterModule
